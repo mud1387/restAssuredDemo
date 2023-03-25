@@ -1,0 +1,69 @@
+import java.io.*;
+import java.util.ArrayList;
+
+public class compareCSV1 {
+
+    public static void main(String[]args) throws FileNotFoundException {
+
+        String path= "C:\\Users\\User\\Documents\\apiAutomation\\src\\test\\resources\\";
+        String file1="File1.csv";
+        String file2="File2.csv";
+        String file3="File3.csv";
+        ArrayList al1= new ArrayList();
+        BufferedReader dataRow1= new BufferedReader(new FileReader(path+file1));
+        BufferedReader dataRow2= new BufferedReader(new FileReader(path+file2));
+        String strDataRow1= null;
+        String strDataRow2= null;
+        boolean linesExist=true;
+        boolean foundDiff= false;
+        int lineNumber=0;
+        int errorNumber=0;
+        int errorThreshold=10;
+        String message="";
+        while (linesExist){
+            try{
+                strDataRow1=dataRow1.readLine();
+                strDataRow2=dataRow2.readLine();
+                lineNumber++;
+                if ((strDataRow1!=null)||(strDataRow2!=null)){
+                    if (!strDataRow2.equals(strDataRow1)){
+                        foundDiff=true;
+                        errorNumber++;
+                        if (errorNumber>errorThreshold) {
+                            message = message + "\r\n" + "\r\n#Found more than " + errorThreshold +
+                                    "lines that were different. Will exit check.";
+                            break;
+                        }
+                            message=message+"\r\n"+"\r\n#Found differences for line number"+
+                                    lineNumber+"\r\nFile1: "+strDataRow1+"\r\nFile2: "+strDataRow2;
+                            al1.add(message);
+                        }
+                    }
+                else {
+                    linesExist=false;
+                }
+            } catch (IOException e) {
+                throw new Error("Problems with reading csv file");
+            }
+        }
+        if (foundDiff){
+            int size= al1.size();
+            try{
+                FileWriter writer= new FileWriter(path+file3);
+                while(size!=0){
+                    size--;
+                    writer.append(""+al1.get(size));
+                    writer.append('\n');
+                }
+                writer.flush();
+                writer.close();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            System.out.println("Found differences between csv files "+ message);
+        }
+
+    }
+
+}
